@@ -85,6 +85,7 @@ class Ui_Transport_Machine_Window(QtWidgets.QWidget):
         self.new_customer_combobox.setObjectName("new_customer_combobox")
         self.new_customer_combobox.setLineEdit(self.new_customer_lineEdit)
         self.new_customer_combobox.addItems(self.customers_names)
+        self.new_customer_combobox.setCurrentText("")
         self.gridLayout.addWidget(self.new_customer_combobox, 2, 0, 1, 1)
         self.copier_notes_label = QtWidgets.QLabel(Transport_Machine_Window)
         font = QtGui.QFont()

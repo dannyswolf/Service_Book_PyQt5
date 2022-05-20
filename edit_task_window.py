@@ -1306,10 +1306,10 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
     def save_task(self):
         try:
             self.selected_calendar.Ημερομηνία = self.dateEdit.date().toString('dd/MM/yyyy')
+            self.selected_calendar.Ημ_Ολοκλ = self.dateEdit.date().toString('dd/MM/yyyy')
             self.selected_calendar.Σκοπός = self.reason_lineEdit.text()
             self.selected_calendar.Ενέργειες = self.action_lineEdit.text()
             self.selected_calendar.Τεχνικός = self.technician_lineEdit.text()
-            self.selected_calendar.Ημ_Ολοκλ = today.replace(" ", "/")
             self.selected_calendar.Επείγων = self.timeEdit.time().toString("HH:mm")
             self.selected_calendar.Τηλέφωνο = self.phones_lineEdit.text()
             self.selected_calendar.Σημειώσεις = self.notes_textEdit.toPlainText()
@@ -1317,12 +1317,13 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
             self.selected_calendar.Μετρητής = self.counter_lineEdit.text()
             self.selected_calendar.Επ_Service = self.next_service_lineEdit.text()
             self.selected_calendar.Price = self.cost_lineEdit.text()
+
             if self.checkBox.isChecked():
                 self.selected_calendar.Κατάσταση = 0
             else:
                 self.selected_calendar.Κατάσταση = 1
 
-            self.selected_service.Ημερομηνία = today.replace(" ", "/")
+            self.selected_service.Ημερομηνία = self.dateEdit.date().toString('dd/MM/yyyy')
             self.selected_service.Σκοπός_Επίσκεψης = self.reason_lineEdit.text()
             self.selected_service.Ενέργειες = self.action_lineEdit.text()
             self.selected_service.Τεχνικός = self.technician_lineEdit.text()

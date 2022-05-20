@@ -106,6 +106,18 @@ class Ui_View_Files_Window(QtWidgets.QWidget):
         self.add_file_btn.clicked.connect(self.add_file)
         self.gridLayout.addWidget(self.add_file_btn, 5, 0, 1, 1)
 
+        # Αριθμός αρχείων
+        self.no_of_files_label = QtWidgets.QLabel(View_Files_Window)
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.no_of_files_label.setFont(font)
+        self.no_of_files_label.setObjectName("no_of_files_label")
+        # self.no_of_files_label.setText(f"Αρχείο {self.file_index}  απο {len(self.files)}")
+        self.gridLayout.addWidget(self.no_of_files_label, 3, 0, 1, 1)
+
         # Esc
         self.shortcut_esc = QtWidgets.QShortcut(QtGui.QKeySequence('Escape'), View_Files_Window)
         self.shortcut_esc.activated.connect(lambda: self.close())
@@ -154,6 +166,7 @@ class Ui_View_Files_Window(QtWidgets.QWidget):
             if self.files[0]:  # αν δεν υπάρχει βγαζει IndexError:  δλδ δεν υπάρχει αχρείο
                 self.file_index = 0  # Ορισμός οτι βλέπουμε το πρώτο αρχείο
                 self.file = os.path.join(self.images_path, self.files[0])
+                self.no_of_files_label.setText(f"Αρχείο {self.file_index +1}  απο {len(self.files)}")
                 if pathlib.Path(self.file).suffix != ".pdf":
                     pixmap = QtGui.QPixmap(os.path.join(self.images_path, self.files[0]))
                     resized_pixmap = pixmap.scaled(600, 600, QtCore.Qt.KeepAspectRatio)
@@ -193,6 +206,7 @@ class Ui_View_Files_Window(QtWidgets.QWidget):
                 # self.save_file_btn.show()
                 self.delete_file_btn.show()
         except (IndexError, TypeError):  # αν δεν υπάρχει κανένα αρχείο
+            self.no_of_files_label.setText(f"Δεν υπάρχει κανένα αρχείο")
             # NoneType οταν ξεκοιναει απο το store.py το self.files = None
             # απόκρηψη κουμπιών
             self.close()  # Να κλείνει αν δεν έχει αρχείο
@@ -208,10 +222,10 @@ class Ui_View_Files_Window(QtWidgets.QWidget):
             if len(self.files) > 1:  # αν υπάρχει πάνω απο ένα αρχείο
                 if self.files[self.file_index] == self.files[-1]:  # Αν είναι το τελευταίο αρχείο
                     self.file_index = 0  # να πάει πάλι απο την αρχή
-
+                    self.no_of_files_label.setText(f"Αρχείο {self.file_index + 1}  απο {len(self.files)}")
                 else:  # Αν δεν είναι το τελευταίο
                     self.file_index += 1  # να πάει στο επώμενο αρχείο
-
+                    self.no_of_files_label.setText(f"Αρχείο {self.file_index + 1}  απο {len(self.files)}")
                 self.file = os.path.join(self.images_path, self.files[self.file_index])  # να πάει στην δευτερη εικόνα
                 if pathlib.Path(self.file).suffix != ".pdf":
                     self.open_pdf_file_btn.hide()  # Απόκρηψη ανοιγμα αρχείου pdf αφου δεν ειναι pdf
@@ -244,10 +258,10 @@ class Ui_View_Files_Window(QtWidgets.QWidget):
             if len(self.files) > 1:  # αν υπάρχει πάνω απο ένα αρχείο
                 if self.files[self.file_index] == self.files[0]:  # Αν είναι το πρώτο αρχείο
                     self.file_index = -1  # να πάει πάλι απο το τέλος
-
+                    self.no_of_files_label.setText(f"Αρχείο {self.file_index + 1}  απο {len(self.files)}")
                 else:  # Αν δεν είναι το πρώτο
                     self.file_index -= 1  # να πάει στο προηγούμενο αρχείο
-
+                    self.no_of_files_label.setText(f"Αρχείο {self.file_index + 1}  απο {len(self.files)}")
                 self.file = os.path.join(self.images_path, self.files[self.file_index])  # να πάει στην δευτερη εικόνα
                 if pathlib.Path(self.file).suffix != ".pdf":
                     self.open_pdf_file_btn.hide()  # Απόκρηψη ανοιγμα αρχείου pdf αφου δεν ειναι pdf

@@ -3,19 +3,20 @@
 #
 
 """  -------------------------------------- Notes---------------------------------------------------
+"V 1.0.2"  20/05/2022   -- Δεν αλλάζει ημερομηνία όταν επεξεργαζόμαστε την κλήση
+                        -- εμφάνιση ποιο αρχείο βλέπουμε στο view_files_window
+                        -- Δυο παράθυρα επεξεργασίας κλήσης και συντήρησης ταυτόχρονα
+
 TODO  *************************** ΠΡΟΒΛΗΜΑ  ***************************
 --- Αν βάλουμε προιόν όταν προσθέτουμε συντήρηση απο το κουμπί προσθήκη συντρηρησης
 --- τότε αυτόματα αποθηκέυεται η συντήρηση ακόμα και αν διαγραψουμε τα ανταλλακτικα
 --- να κάνω το παράθυρο να μην κλήνει δεν είναι καλή ιδέα
 
-todo ----------------  Αλλαγές στην Βάση Δεδομένων ---------------
-todo στον πίνακα Service_data να βάλω πεδίο Τεχνικός
-todo στον πίνακα Companies να αλλάξω το πεδίο Μοντέλο σε  Κατηγορία_μηχανήματος
-todo Νέος Πίνακας Support με πεδία ID, IsActive, (INTEGER) και Activation_date (TEXT)
-
-
 
 todo ανάλυση συναρτίσεων
+            todo στον πίνακα Service_data να βάλω πεδίο Τεχνικός -------------------- done
+            todo στον πίνακα Companies να αλλάξω το πεδίο Μοντέλο σε  Κατηγορία_μηχανήματος -------------------- done
+            todo Νέος Πίνακας Support με πεδία ID, IsActive, (INTEGER) και Activation_date (TEXT) -------------- done
             todo προβολή κουμπή ανοιχτής κλήσης στο ιστορικό μηχανήματος -  27/11/2021
             todo νεο παράθυρο αποστολής email   --------------------------  25/11/2021
             todo νεο παράθυρο ενεργοποιήσης υποστήριξης  -----------------  22/11/2021
@@ -104,9 +105,7 @@ from activation import Ui_Activation_Window
 from edit_malanotainies_window import Ui_edit_melanotainies_window
 from edit_spare_part_window import Ui_edit_spare_parts_window
 from edit_consumables_window import Ui_edit_consumables_window
-from add_spare_part_to_store_window import Ui_Add_Spare_Parts_Window
-from add_malanotainies_to_store_window import Ui_Add_Melanotainies_Window
-from add_consumables_to_store_window import Ui_Add_Consumables_Window
+
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
 
@@ -203,6 +202,10 @@ def to_excel():
 class Ui_MainWindow(object):
     def __init__(self, *args, **kwargs):
         super(Ui_MainWindow, self).__init__(*args, **kwargs)
+        self.edit_task_window = None
+        self.second_edit_task_window = None
+        self.edit_service_window = None
+        self.second_edit_service_window = None
         self.active_customers = None
         self.active_machines = None
         self.active_tasks = None
@@ -233,7 +236,7 @@ class Ui_MainWindow(object):
         self.screen = MainWindow.screen()
         self.size = self.screen.size()
         # print('Size: %d x %d' % (self.size.width(), self.size.height()))
-        # MainWindow.resize(1500, self.size.height() - 100)
+        MainWindow.resize(1500, self.size.height() - 100)
         self.main_window_icon = QtGui.QIcon()
         self.main_window_icon.addPixmap(QtGui.QPixmap("icons/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(self.main_window_icon)
@@ -1286,25 +1289,24 @@ class Ui_MainWindow(object):
         self.gridLayout_6.addWidget(self.search_on_store_toolButton, 1, 3, 1, 1)
 
         # Προσθήκη στην Αποθήκη
-        self.add_item_to_company_toolButton = QtWidgets.QToolButton(self.store_tab)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.add_item_to_company_toolButton.sizePolicy().hasHeightForWidth())
-        self.add_item_to_company_toolButton.setSizePolicy(sizePolicy)
-        self.add_item_to_company_toolButton.setFont(self.font_12_bold)
-        self.add_item_to_company_toolButton.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        self.add_item_to_company_toolButton.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.add_item_to_company_toolButton.setAutoFillBackground(False)
-        self.add_item_to_company_toolButton.setStyleSheet(
-            "background-color: rgb(104, 104, 104);\n" "color: rgb(255, 255, 255);")
-        self.add_item_to_company_toolButton.setIcon(self.add_spare_part_icon)
-        self.add_item_to_company_toolButton.setIconSize(QtCore.QSize(30, 30))
-        # self.add_item_to_company_toolButton.setShortcut("")
-        self.add_item_to_company_toolButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
-        self.add_item_to_company_toolButton.setObjectName("add_item_to_company_toolButton")
-        self.add_item_to_company_toolButton.clicked.connect(self.add_spare_part_to_store_window)
-        self.gridLayout_6.addWidget(self.add_item_to_company_toolButton, 3, 0, 1, 1)
+        # self.add_item_to_company_toolButton = QtWidgets.QToolButton(self.store_tab)
+        # sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
+        # sizePolicy.setHorizontalStretch(0)
+        # sizePolicy.setVerticalStretch(0)
+        # sizePolicy.setHeightForWidth(self.add_item_to_company_toolButton.sizePolicy().hasHeightForWidth())
+        # self.add_item_to_company_toolButton.setSizePolicy(sizePolicy)
+        # self.add_item_to_company_toolButton.setFont(self.font_12_bold)
+        # self.add_item_to_company_toolButton.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        # self.add_item_to_company_toolButton.setLayoutDirection(QtCore.Qt.LeftToRight)
+        # self.add_item_to_company_toolButton.setAutoFillBackground(False)
+        # self.add_item_to_company_toolButton.setStyleSheet(
+        #     "background-color: rgb(104, 104, 104);\n" "color: rgb(255, 255, 255);")
+        # self.add_item_to_company_toolButton.setIcon(self.add_spare_part_icon)
+        # self.add_item_to_company_toolButton.setIconSize(QtCore.QSize(30, 30))
+        # # self.add_item_to_company_toolButton.setShortcut("")
+        # self.add_item_to_company_toolButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
+        # self.add_item_to_company_toolButton.setObjectName("add_item_to_company_toolButton")
+        # self.gridLayout_6.addWidget(self.add_item_to_company_toolButton, 3, 0, 1, 1)
 
         self.tabWidget.addTab(self.store_tab, self.store_icon, "")
         self.gridLayout_3.addWidget(self.tabWidget, 0, 4, 5, 11)
@@ -1529,7 +1531,7 @@ class Ui_MainWindow(object):
                                   _translate("MainWindow", "Ανταλλακτικά"))
         self.companies_label.setText(_translate("MainWindow", "Εταιρεία"))
         self.search_on_store_label.setText(_translate("MainWindow", "Αναζήτηση"))
-        self.add_item_to_company_toolButton.setText(_translate("MainWindow", "  Προσθήκη ανταλλακτικού"))
+        # self.add_item_to_company_toolButton.setText(_translate("MainWindow", "  Προσθήκη ανταλλακτικού"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.store_tab), _translate("MainWindow", "Αποθήκη"))
         self.add_task_toolButton.setText(_translate("MainWindow", "  Προσθήκη εργασίας"))
         self.menu.setTitle(_translate("MainWindow", "Πελάτες"))
@@ -2326,11 +2328,7 @@ class Ui_MainWindow(object):
         selected_index = self.companies_comboBox.currentIndex()
         self.selected_table = store_tables[selected_index]
         selected_table_items = get_spare_parts(self.selected_table)
-        try:
-            first_item = selected_table_items[0]
-        except IndexError:  # Οταν δέν έχει κανένα προιόν
-            self.store_treeWidget.clear()
-            return
+        first_item = selected_table_items[0]
 
         try:  # Εμφάνιση ανταλλακτικών
             test = first_item.PARTS_NR  # AttributeError:  # Αν ο πίνακας δεν έχει PARTS_NR
@@ -2869,11 +2867,6 @@ class Ui_MainWindow(object):
 
     # -------------------------------------------------- Νέα παράθυρα ------------------------------------
     def show_add_new_customer_window(self):
-        # Demo
-        if self.active_customers.count() > 5:
-            QtWidgets.QMessageBox.warning(None, "Προσοχή",
-                                          "H εφαρμογή είναι Demo\nΔεν μπορείτε να προσθέσεται νέο πελάτη!")
-            return
         self.add_new_customer_window = QtWidgets.QWidget()
         # self.show_add_new_customer_window.setWindowTitle("Προσθήκη νέου πελάτη")
         self.add_new_customer = Ui_add_new_customer_window()
@@ -2885,10 +2878,6 @@ class Ui_MainWindow(object):
                                                              self.add_new_customer_window.close()))
 
     def show_add_new_machine_window(self):
-        if self.active_machines.count() > 5:
-            QtWidgets.QMessageBox.warning(None, "Προσοχή",
-                                          "H εφαρμογή είναι Demo\nΔεν μπορείτε να προσθέσεται νέο μηχάνημα!")
-            return
         self.add_new_machine_window = QtWidgets.QWidget()
         # self.show_add_new_customer_window.setWindowTitle("Προσθήκη νέου πελάτη")
         self.add_new_machine = Ui_add_new_machine_window()
@@ -2972,13 +2961,28 @@ class Ui_MainWindow(object):
             selected_calendar_id = item.text(0)  # Οταν πατάμε διπλο click στης εργασίες
         except AttributeError:  # 'NoneType' object has no attribute 'text' Οταν πατάμε απο το history treewidget
             selected_calendar_id = calendar_id
-        self.edit_task_window = QtWidgets.QWidget()
-        self.edit_task = Ui_Edit_Task_Window()
-        self.edit_task.selected_calendar_id = selected_calendar_id
-        self.edit_task.setupUi(self.edit_task_window)
-        self.edit_task.window = self.edit_task_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
-        self.edit_task_window.show()
-        self.edit_task.window_closed.connect(lambda: (self.show_active_tasks(), self.edit_task_window.close()))
+        # Αν δεν υπάρχει edit_task_window ή αν ο χρήστης εχει κλεισει το παράθυρο απο το Χ πανω δεξια
+        # ελεγχουμε αν ειναι ορατο
+        if self.edit_task_window is None or not self.edit_task_window.isVisible():
+            self.edit_task_window = QtWidgets.QWidget()
+            self.edit_task = Ui_Edit_Task_Window()
+            self.edit_task.selected_calendar_id = selected_calendar_id
+            self.edit_task.setupUi(self.edit_task_window)
+            self.edit_task.window = self.edit_task_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
+            self.edit_task_window.show()
+            self.edit_task.window_closed.connect(lambda: (self.show_active_tasks(), self.edit_task_window.close()))
+        elif self.second_edit_task_window is None or not self.second_edit_task_window.isVisible():
+            self.second_edit_task_window = QtWidgets.QWidget()
+            self.second_edit_task = Ui_Edit_Task_Window()
+            self.second_edit_task.selected_calendar_id = selected_calendar_id
+            self.second_edit_task.setupUi(self.second_edit_task_window)
+            self.second_edit_task.window = self.second_edit_task_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
+            self.second_edit_task_window.show()
+            self.second_edit_task.window_closed.connect(lambda: (self.show_active_tasks(), self.second_edit_task_window.close()))
+        else:
+            QtWidgets.QMessageBox.warning(None, 'Προσοχή!', f"Παρακαλώ κλείστε ενα απο τα ανοιχτά παράθυρα "
+                                                            f"επεξεργασίας κλήσης.")
+            return
 
     def show_edit_service_window(self, item, column):
         selected_service_id = item.text(0)
@@ -2987,14 +2991,28 @@ class Ui_MainWindow(object):
             self.show_edit_task_window(calendar_id=selected_calendar.ID)
         else:
             self.selected_service = get_service_from_id(selected_service_id)
-            self.edit_service_window = QtWidgets.QWidget()
-            self.edit_service = Ui_Edit_Service_Window()
-            self.edit_service.selected_service = self.selected_service
-            self.edit_service.setupUi(self.edit_service_window)
-            self.edit_service.get_service_data()
-            self.edit_service.window = self.edit_service_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
-            self.edit_service_window.show()
-            self.edit_service.window_closed.connect(self.edit_service_window.close)
+            if self.edit_service_window is None or not self.edit_service_window.isVisible():
+                self.edit_service_window = QtWidgets.QWidget()
+                self.edit_service = Ui_Edit_Service_Window()
+                self.edit_service.selected_service = self.selected_service
+                self.edit_service.setupUi(self.edit_service_window)
+                self.edit_service.get_service_data()
+                self.edit_service.window = self.edit_service_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
+                self.edit_service_window.show()
+                self.edit_service.window_closed.connect(self.edit_service_window.close)
+            elif self.second_edit_service_window is None or not self.second_edit_service_window.isVisible():
+                self.second_edit_service_window = QtWidgets.QWidget()
+                self.second_edit_service = Ui_Edit_Service_Window()
+                self.second_edit_service.selected_service = self.selected_service
+                self.second_edit_service.setupUi(self.second_edit_service_window)
+                self.second_edit_service.get_service_data()
+                self.second_edit_service.window = self.second_edit_service_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
+                self.second_edit_service_window.show()
+                self.second_edit_service.window_closed.connect(self.second_edit_service_window.close)
+            else:
+                QtWidgets.QMessageBox.warning(None, 'Προσοχή!', f"Παρακαλώ κλείστε ενα απο τα ανοιχτά παράθυρα "
+                                                                f"επεξεργασίας συντήρησης.")
+                return
 
     def show_add_service_window(self):
         if self.selected_machine is None:
@@ -3119,55 +3137,6 @@ class Ui_MainWindow(object):
         self.edit_consumable.window = self.edit_consumables_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
         self.edit_consumables_window.show()
         self.edit_consumable.window_closed.connect(lambda: (self.show_selected_store_table(), self.edit_consumables_window.close()))
-
-    def add_spare_part_to_store_window(self):
-        if self.selected_table == Brother or self.selected_table == Canon or self.selected_table == Epson \
-                or self.selected_table == Konica or self.selected_table == Kyocera or self.selected_table == Lexmark \
-                or self.selected_table == Oki or self.selected_table == Ricoh or self.selected_table == Samsung or \
-                self.selected_table == Sharp:
-            self.show_add_spare_part_to_store_window()
-        elif self.selected_table == Melanotainies:
-            self.show_add_melanotainies_window()
-        else:
-            self.show_add_consumables_window()
-
-    def show_add_spare_part_to_store_window(self):
-        self.add_spare_part_to_store_window = QtWidgets.QWidget()
-        self.add_spare_part_to_store_window.setWindowTitle("Προσθήκη ανταλλακτικού")
-        self.add_spare_part_to_store = Ui_Add_Spare_Parts_Window()
-        self.add_spare_part_to_store.setupUi(self.add_spare_part_to_store_window)  # Αρχικοποιηση των κουμπιων, γραμμων επεξεργασίας κτλπ
-        self.add_spare_part_to_store.selected_table = self.selected_table
-        # self.add_spare_part_to_store.edit_spare_part()  # Εμφάνηση δεδομένων απο την βάση δεδομένων
-        # self.add_spare_part_to_store.show_file()  # Εμφάνηση Αρχείων
-        self.add_spare_part_to_store.window = self.add_spare_part_to_store_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
-        self.add_spare_part_to_store_window.show()
-        self.add_spare_part_to_store.window_closed.connect(lambda: (self.show_selected_store_table(), self.add_spare_part_to_store_window.close()))
-
-    def show_add_melanotainies_window(self):
-        self.add_melanotainies_window = QtWidgets.QWidget()
-        self.add_melanotainies_window.setWindowTitle("Προσθήκη μελανοταινίας")
-        self.add_melanotainies_window.setStyleSheet(u"font: 75 13pt \"Calibri\";")
-        self.add_melanotainia = Ui_Add_Melanotainies_Window()
-        self.add_melanotainia.setupUi(self.add_melanotainies_window)  # Αρχικοποιηση των κουμπιων, γραμμων επεξεργασίας κτλπ
-        self.add_melanotainia.selected_table = self.selected_table
-        self.add_melanotainia.edit_melanotainia()  # Εμφάνηση δεδομένων απο την βάση δεδομένων
-        # self.add_melanotainia.show_file()  # Εμφάνηση Αρχείων
-        self.add_melanotainia.window = self.add_melanotainies_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
-        self.add_melanotainies_window.show()
-        self.add_melanotainia.window_closed.connect(lambda: (self.show_selected_store_table(), self.add_melanotainies_window.close()))
-
-    def show_add_consumables_window(self):
-        self.add_consumables_window = QtWidgets.QWidget()
-        self.add_consumables_window.setWindowTitle("Προσθήκη αναλώσιμου")
-        self.add_consumables_window.setStyleSheet(u"font: 75 13pt \"Calibri\";")
-        self.add_consumable = Ui_Add_Consumables_Window()
-        self.add_consumable.setupUi(self.add_consumables_window)  # Αρχικοποιηση των κουμπιων, γραμμων επεξεργασίας κτλπ
-        self.add_consumable.selected_table = self.selected_table
-        self.add_consumable.edit_consumable()  # Εμφάνηση δεδομένων απο την βάση δεδομένων
-        # self.add_melanotainia.show_file()  # Εμφάνηση Αρχείων
-        self.add_consumable.window = self.add_consumables_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
-        self.add_consumables_window.show()
-        self.add_consumable.window_closed.connect(lambda: (self.show_selected_store_table(), self.add_consumables_window.close()))
 
 
 if __name__ == "__main__":
