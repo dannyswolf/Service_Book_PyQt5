@@ -5,7 +5,7 @@ import logging
 import os
 import sys
 
-VERSION = "Demo V 1.0.2"
+VERSION = "Demo V 1.0.3"
 today = datetime.datetime.today().strftime("%d %m %Y")
 user = getpass.getuser()
 
