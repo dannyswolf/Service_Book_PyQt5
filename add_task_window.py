@@ -682,7 +682,7 @@ class Ui_Add_Task_Window(QtWidgets.QWidget):
                 new_task = Calendar(Ημερομηνία=started_date, Πελάτης=self.selected_customer.Επωνυμία_Επιχείρησης,
                                     Μηχάνημα=self.selected_machine.Εταιρεία + f"  Serial: {self.selected_machine.Serial}",
                                     Σκοπός=self.reason_lineEdit.text(), Ενέργειες=self.action_lineEdit.text(),
-                                    Τεχνικός=self.technician_lineEdit.text(), Ημ_Ολοκλ="",
+                                    Τεχνικός=self.technician_lineEdit.text(), Ημ_Ολοκλ="01/01/2000",
                                     Επείγων=time_for_task, Τηλέφωνο=self.phones_lineEdit.text(),
                                     Σημειώσεις=self.notes_textEdit.toPlainText(), Copier_ID=self.selected_machine.ID,
                                     ΔΤΕ="", Service_ID=new_service.ID, Μετρητής="", Επ_Service="",

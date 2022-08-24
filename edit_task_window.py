@@ -20,6 +20,7 @@ from add_spare_part_from_store import Ui_Add_Spare_Part_From_Store
 from view_files_window import Ui_View_Files_Window
 from add_spare_part_not_from_store import Ui_Add_Spare_Part_Not_From_Store
 from send_email import Ui_Send_Email_Window
+
 sys.stderr.write = root_logger.error
 sys.stdout.write = root_logger.info
 
@@ -48,6 +49,8 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
         self.selected_calendar = None
         self.images_path = None
         self.files = None
+        self.icons_path = os.path.join(os.getcwd(), "icons")
+        self.fonts_path = os.path.join(os.getcwd(), "fonts")
 
         self.font_14_bold = QtGui.QFont()
         self.font_14_bold.setFamily("Calibri")
@@ -258,8 +261,6 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
         self.machine_lineEdit.setReadOnly(True)
         self.gridLayout_2.addWidget(self.machine_lineEdit, 6, 1, 1, 4)
 
-
-
         # counter label
         self.counter_label = QtWidgets.QLabel(self.work_tab)
         self.counter_label.setMinimumSize(QtCore.QSize(0, 25))
@@ -293,6 +294,26 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
         self.next_service_lineEdit.setText("")
         self.next_service_lineEdit.setObjectName("next_service_lineEdit")
         self.gridLayout_2.addWidget(self.next_service_lineEdit, 8, 1, 1, 1)
+
+        # Ημερομηνία date Label
+        self.finish_date_label = QtWidgets.QLabel(self.work_tab)
+        self.finish_date_label.setMinimumSize(QtCore.QSize(0, 25))
+        self.finish_date_label.setFont(self.font_12_bold)
+        self.finish_date_label.setStyleSheet("background-color: rgb(93, 93, 93);\n"
+                                             "color: rgb(255, 255, 255);")
+        self.finish_date_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.finish_date_label.setObjectName("finish_date_label")
+        self.gridLayout_2.addWidget(self.finish_date_label, 7, 4, 1, 1)
+        # date edit
+        self.finish_dateEdit = QtWidgets.QDateEdit(self.work_tab)
+        self.finish_dateEdit.setMinimumSize(QtCore.QSize(150, 35))
+        self.finish_dateEdit.setFont(self.font_13_bold)
+        self.finish_dateEdit.setAlignment(QtCore.Qt.AlignCenter)
+        self.finish_dateEdit.setDisplayFormat("dd/MM/yyyy")
+        self.finish_dateEdit.setCalendarPopup(True)
+        # self.finish_dateEdit.setReadOnly(True)
+        self.finish_dateEdit.setObjectName("finish_dateEdit")
+        self.gridLayout_2.addWidget(self.finish_dateEdit, 8, 4, 1, 1)
 
         # technician label
         self.technician_label = QtWidgets.QLabel(self.work_tab)
@@ -671,7 +692,8 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
         self.action_label.setText(_translate("Edit_Task_Window", "Ενέργειες"))
         self.finished_label.setText(_translate("Edit_Task_Window", "Ολοκληρώθηκε"))
         self.notes_label.setText(_translate("Edit_Task_Window", "Σημειώσεις"))
-        self.date_label.setText(_translate("Edit_Task_Window", "Ημερομηνία"))
+        self.date_label.setText(_translate("Edit_Task_Window", "Εναρξη"))
+        self.finish_date_label.setText(_translate("Edit_Task_Window", "Λήξη"))
         self.address_label.setText(_translate("Edit_Task_Window", "Διεύθυνση"))
         self.reason_label.setText(_translate("Edit_Task_Window", "Σκοπός εργασίας"))
         self.add_action_toolButton.setText(_translate("Edit_Task_Window", "..."))
@@ -712,7 +734,6 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
         self.technician_combobox.clear()
         self.technician_combobox.addItems(self.service_technicians)
 
-
         self.reason_completer = QtWidgets.QCompleter(self.service_reasons)
         self.reason_lineEdit.setCompleter(self.reason_completer)
 
@@ -739,7 +760,8 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
             self.responsible_lineEdit.setText(self.selected_calendar.machine.Customer.Ονοματεπώνυμο)
             self.phones_lineEdit.setText(self.selected_calendar.Τηλέφωνο)
             self.address_lineEdit.setText(self.selected_calendar.machine.Customer.Διεύθυνση)
-            self.machine_lineEdit.setText(self.selected_calendar.machine.Εταιρεία + f"  Serial: {self.selected_calendar.machine.Serial}")
+            self.machine_lineEdit.setText(
+                self.selected_calendar.machine.Εταιρεία + f"  Serial: {self.selected_calendar.machine.Serial}")
             self.technician_lineEdit.setText(self.selected_calendar.Τεχνικός)
             self.counter_lineEdit.setText(self.selected_calendar.Μετρητής)
             self.next_service_lineEdit.setText(self.selected_calendar.Επ_Service)
@@ -748,7 +770,8 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
             self.dte_lineEdit.setText(self.selected_calendar.ΔΤΕ)
             self.action_lineEdit.setText(self.selected_calendar.Ενέργειες)
             self.notes_textEdit.setText(self.selected_calendar.Σημειώσεις)
-            old_text =  self.notes_textEdit.toPlainText()
+            self.finish_dateEdit.setDate(QtCore.QDate.fromString("01/01/2000", "dd'/'MM'/'yyyy"))
+            old_text = self.notes_textEdit.toPlainText()
             append_text = f"-------------------------------- {user} {today.replace(' ', '/')} --------------------------------\n"
             len_append_text = len(append_text)
             if old_text[-len_append_text:] != append_text:
@@ -838,7 +861,7 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
         if os.path.exists(self.images_path):
             self.files = os.listdir(self.images_path)
             if len(self.files) > 0:  # Μπορεί να υπάρχει ο φάκελος αλλά να μήν έχει αρχεία μέσα
-                                    # --> οταν τα σβήνουμε μενει αδειος
+                # --> οταν τα σβήνουμε μενει αδειος
                 self.view_files_toolButton.show()
                 self.view_files_toolButton.setText(f"   Προβολή {len(self.files)} αρχείων")
             else:
@@ -875,7 +898,8 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
     def add_technician_to_db(self):
         try:
             if check_if_technician_service_data_exist(self.technician_lineEdit.text().upper()):
-                QtWidgets.QMessageBox.warning(None, "Προσοχή", f"O τεχνικός '{self.technician_lineEdit.text().upper()}' υπάρχει")
+                QtWidgets.QMessageBox.warning(None, "Προσοχή",
+                                              f"O τεχνικός '{self.technician_lineEdit.text().upper()}' υπάρχει")
                 return
             technician = Service_data(Τεχνικός=self.technician_lineEdit.text().upper())
             service_session.add(technician)
@@ -890,8 +914,8 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
     def add_file(self):
         options = QtWidgets.QFileDialog.Options()
         new_files, _ = QtWidgets.QFileDialog.getOpenFileNames(self, "QFileDialog.getOpenFileNames()", "",
-                                                    "Υποστηριζόμενα αρχεία .bmp .gif .png .jpeg .jpg .pdf (*.bmp "
-                                                    "*.gif *.png *.jpeg *.jpg *.pdf)", options=options)
+                                                              "Υποστηριζόμενα αρχεία .bmp .gif .png .jpeg .jpg .pdf (*.bmp "
+                                                              "*.gif *.png *.jpeg *.jpg *.pdf)", options=options)
         if new_files:
             if not os.path.exists(self.images_path):
                 os.makedirs(self.images_path)
@@ -902,14 +926,15 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
                 basename = os.path.basename(new_file).replace(" ", "_")
                 if not os.path.exists(os.path.join(self.images_path, os.path.basename(new_file))):
                     shutil.copy(new_file, os.path.join(self.images_path, basename), follow_symlinks=False)
-                    QtWidgets.QMessageBox.information(None, "Επιτυχία", f'Το αρχεία {os.path.basename(new_file)} προστέθηκε '
-                                                              f'επιτυχώς')
+                    QtWidgets.QMessageBox.information(None, "Επιτυχία",
+                                                      f'Το αρχεία {os.path.basename(new_file)} προστέθηκε '
+                                                      f'επιτυχώς')
                     # Να εμφανίσει το αρχείο
                     self.update_files()
                 else:
                     QtWidgets.QMessageBox.warning(None, "Σφάλμα",
-                                        f"Το αρχείο {os.path.basename(new_file)} υπάρχει.\nΠαρακαλώ αλλάξτε όνομα ή "
-                                        f"επιλεξτε διαφορετικό αρχείο")
+                                                  f"Το αρχείο {os.path.basename(new_file)} υπάρχει.\nΠαρακαλώ αλλάξτε όνομα ή "
+                                                  f"επιλεξτε διαφορετικό αρχείο")
 
     # Αποστολή email
     def send_mail(self):
@@ -984,7 +1009,7 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
         font = """{
                 font-family: Calibri;
                 font-stretch: 50%;
-                src: url('../fonts/Calibri.ttf');
+                src: url('../fonts/calibri.ttf');
                 }
                 mark.red {
                 color:#ff0000;
@@ -1008,14 +1033,13 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
                 }
                 h4 {
                 font-family: Calibri;
-
                 }
                 """
 
-        src = "../icons/"
+        # src = "icons/"
         html_spare_parts = []  # ΚΩΔΙΚΟΣ ΠΕΡΙΓΡΑΦΗ
         for index, spare_part in enumerate(self.selected_calendar_spare_parts):
-            html_spare_parts.append(f"""{index+1}. <mark class="red">Κωδικός: {spare_part.ΚΩΔΙΚΟΣ} </mark> --> 
+            html_spare_parts.append(f"""{index + 1}. <mark class="red">Κωδικός: {spare_part.ΚΩΔΙΚΟΣ} </mark> --> 
             {spare_part.ΠΕΡΙΓΡΑΦΗ} <mark class="green">Τεμάχια: {spare_part.ΤΕΜΑΧΙΑ} </mark> <br>
                                     """.replace('\n', ""))
 
@@ -1028,7 +1052,7 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
             <body>
             <font size = "6"> 
             <h2 style="text-align: center;"><span style="text-decoration: underline;">
-            <img style="float: right;" src="{src}logo-small-orange.png" alt="" width="150" height="108"/> 
+            <img style="float: right;" src="{self.icons_path}/logo-small-orange.png" alt="" width="150" height="108"/> 
             Δελτίο τεχνικής εξυπηρέτησης
             </span></h2>
             
@@ -1175,7 +1199,8 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
         self.add_spare_part_from_store.setupUi(self.add_spare_part_from_store_window)
         self.add_spare_part_from_store.window = self.add_spare_part_from_store_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
         self.add_spare_part_from_store_window.show()
-        self.add_spare_part_from_store.window_closed.connect(lambda: (self.show_spare_parts(), self.add_spare_part_from_store_window.close()))
+        self.add_spare_part_from_store.window_closed.connect(
+            lambda: (self.show_spare_parts(), self.add_spare_part_from_store_window.close()))
 
     def show_add_spare_part_not_from_store_window(self):
         self.add_spare_part_not_from_store_window = QtWidgets.QWidget()
@@ -1190,7 +1215,8 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
 
         self.add_spare_part_not_from_store.window = self.add_spare_part_not_from_store_window  # Αν θέλουμε να ανοιγουν πολλα παράθυρα
         self.add_spare_part_not_from_store_window.show()
-        self.add_spare_part_not_from_store.window_closed.connect(lambda: (self.show_spare_parts(), self.add_spare_part_not_from_store_window.close()))
+        self.add_spare_part_not_from_store.window_closed.connect(
+            lambda: (self.show_spare_parts(), self.add_spare_part_not_from_store_window.close()))
 
     def view_files(self):
         self.view_files_window = QtWidgets.QWidget()
@@ -1207,7 +1233,7 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
     def delete_spare_part(self):
         selected_consumable = self.spare_parts_treeWidget.selectedItems()
 
-        if len(selected_consumable) < 1: # ΑΝ δεν επιλέξει κανένα και πατηση διαγραφή
+        if len(selected_consumable) < 1:  # ΑΝ δεν επιλέξει κανένα και πατηση διαγραφή
             return
         else:
             selected_consumable_id = selected_consumable[0].text(0)
@@ -1221,8 +1247,8 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
                                                    QtWidgets.QMessageBox.No)
             if answer == QtWidgets.QMessageBox.Yes:  # Προσθήκη πίσω στην αποθήκη
                 answer2 = QtWidgets.QMessageBox.warning(None, "Προσοχή!", f"Να προστεθεί το τεμάχιο πίσω στην αποθήκη;",
-                                                       QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                                                       QtWidgets.QMessageBox.No)
+                                                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                        QtWidgets.QMessageBox.No)
                 # Ενημέρωση αποθήκης
                 if answer2 == QtWidgets.QMessageBox.Yes:
                     self.update_store(consumable_obj, spare_part_obj_from_store, selected_consumable_code)
@@ -1239,24 +1265,24 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
             return
         else:
 
-                answer = QtWidgets.QMessageBox.warning(None, "Προσοχή!", f"Σίγουρα θέλετε να διαγράψετε την εργασία;",
-                                                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                                                        QtWidgets.QMessageBox.No)
-                if answer == QtWidgets.QMessageBox.Yes:
-                    try:
-                        service_session.delete(self.selected_calendar)
-                        service_session.delete(self.selected_service)
-                        service_session.commit()
-                        QtWidgets.QMessageBox.information(None, "Προσοχή!", f"H εργασία διαγράφτηκε!")
-                        self.close()
-                    except Exception:
-                        service_session.rollback()
-                        traceback.print_exc()
-                        QtWidgets.QMessageBox.critical(None, "Προσοχή!",
-                                                       f"Κάτι δεν πήγε καλά η εργασία δεν διαγράφτηκε!")
-                        return
-                else:
+            answer = QtWidgets.QMessageBox.warning(None, "Προσοχή!", f"Σίγουρα θέλετε να διαγράψετε την εργασία;",
+                                                   QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                   QtWidgets.QMessageBox.No)
+            if answer == QtWidgets.QMessageBox.Yes:
+                try:
+                    service_session.delete(self.selected_calendar)
+                    service_session.delete(self.selected_service)
+                    service_session.commit()
+                    QtWidgets.QMessageBox.information(None, "Προσοχή!", f"H εργασία διαγράφτηκε!")
+                    self.close()
+                except Exception:
+                    service_session.rollback()
+                    traceback.print_exc()
+                    QtWidgets.QMessageBox.critical(None, "Προσοχή!",
+                                                   f"Κάτι δεν πήγε καλά η εργασία δεν διαγράφτηκε!")
                     return
+            else:
+                return
 
     def update_store(self, consumable_obj, spare_part_obj_from_store, selected_consumable_code):
         """
@@ -1274,7 +1300,7 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
             return
         try:  # Ελεγχος για τα τεμάχια
             old_pieces = int(spare_part_obj_from_store.ΤΕΜΑΧΙΑ)
-            new_pieces = old_pieces + int(consumable_obj.ΤΕΜΑΧΙΑ) # Να προσθέση όσα είχαμε βάλει στον πελάτη
+            new_pieces = old_pieces + int(consumable_obj.ΤΕΜΑΧΙΑ)  # Να προσθέση όσα είχαμε βάλει στον πελάτη
             spare_part_obj_from_store.ΤΕΜΑΧΙΑ = new_pieces
             store_session.commit()
         except ValueError:  # Οταν τα τεμάχια δεν είναι αριθμός
@@ -1306,7 +1332,6 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
     def save_task(self):
         try:
             self.selected_calendar.Ημερομηνία = self.dateEdit.date().toString('dd/MM/yyyy')
-            self.selected_calendar.Ημ_Ολοκλ = self.dateEdit.date().toString('dd/MM/yyyy')
             self.selected_calendar.Σκοπός = self.reason_lineEdit.text()
             self.selected_calendar.Ενέργειες = self.action_lineEdit.text()
             self.selected_calendar.Τεχνικός = self.technician_lineEdit.text()
@@ -1320,8 +1345,13 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
 
             if self.checkBox.isChecked():
                 self.selected_calendar.Κατάσταση = 0
+                # Ελεγχος αν έχουμε κλήσει την κλήση
+                if self.selected_calendar.Ημ_Ολοκλ == "01/01/2000" or self.selected_calendar.Ημ_Ολοκλ == "":
+                    self.selected_calendar.Ημ_Ολοκλ = self.finish_dateEdit.date().toString('dd/MM/yyyy')
+
             else:
                 self.selected_calendar.Κατάσταση = 1
+                self.selected_calendar.Ημ_Ολοκλ = "01/01/2000"
 
             self.selected_service.Ημερομηνία = self.dateEdit.date().toString('dd/MM/yyyy')
             self.selected_service.Σκοπός_Επίσκεψης = self.reason_lineEdit.text()
@@ -1348,13 +1378,22 @@ class Ui_Edit_Task_Window(QtWidgets.QWidget):
             self.checkBox.setIcon(self.done_icon)
             self.finished_label.setStyleSheet("background-color: rgb(0, 170, 0);\n"
                                               "color: rgb(255, 255, 255);")
+            if self.selected_calendar.Κατάσταση == 1:
+                self.finish_dateEdit.setDate(QtCore.QDate.currentDate())
+            else:
+                self.finish_dateEdit.setDate(QtCore.QDate.fromString(self.selected_calendar.Ημ_Ολοκλ, "dd'/'MM'/'yyyy"))
+                self.finish_dateEdit.setReadOnly(True)
+            self.finish_dateEdit.setStyleSheet("background-color: rgb(0, 170, 0);\n"
+                                               "color: rgb(255, 255, 255);")
+
         else:
             self.checkBox.setChecked(False)
             self.checkBox.setIcon(self.not_done_icon)
             self.finished_label.setStyleSheet("background-color: red;\n"
                                               "color: white;")
-
-
+            self.finish_dateEdit.setDate(QtCore.QDate.fromString("01/01/2000", "dd'/'MM'/'yyyy"))
+            self.finish_dateEdit.setStyleSheet("background-color: white;\n"
+                                               "color: black;")
 
 
 if __name__ == "__main__":
