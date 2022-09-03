@@ -217,7 +217,6 @@ class Ui_Add_Task_Window(QtWidgets.QWidget):
         self.technician_lineEdit.setMinimumSize(QtCore.QSize(0, 35))
         self.technician_lineEdit.setFont(self.font_13)
         self.technician_lineEdit.setObjectName("technician_lineEdit")
-        self.technician_lineEdit.setText("Ιορδάνης")
         self.technician_combobox = QtWidgets.QComboBox(Add_Task_Window)
         self.technician_combobox.setFont(self.font_13)
         self.technician_combobox.setLineEdit(self.technician_lineEdit)

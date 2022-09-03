@@ -164,7 +164,6 @@ class Ui_Add_Service_Window(QtWidgets.QWidget):
         self.technician_lineEdit.setMinimumSize(QtCore.QSize(0, 35))
         self.technician_lineEdit.setFont(self.font_13)
         self.technician_lineEdit.setObjectName("technician_lineEdit")
-        self.technician_lineEdit.setText("Ιορδάνης")
         self.technician_combobox = QtWidgets.QComboBox(self.work_tab)
         self.technician_combobox.setFont(self.font_13)
         self.technician_combobox.setLineEdit(self.technician_lineEdit)
@@ -547,7 +546,6 @@ class Ui_Add_Service_Window(QtWidgets.QWidget):
         self.technician_completer.popup().setFont(self.font_13)
         self.technician_combobox.clear()
         self.technician_combobox.addItems(self.service_technicians)
-        self.technician_lineEdit.setText("ΙΟΡΔΑΝΗΣ")
 
         self.reason_completer = QtWidgets.QCompleter(self.service_reasons)
         self.reason_completer.popup().setFont(self.font_13)
