@@ -8,7 +8,7 @@
 
 Για δημιουργία pdf αρχείων
 Δεν μπορούν τα windows να ανοίξουν το προσωρινό Font 
-reportlab.pdfbase.ttfonts.TTFError: Can't open file "C:\Users\dannys\AppData\Local\Temp\tmpokjxtzo7.ttf"
+reportlab.pdfbase.ttfonts.TTFError: Can't open file "C:\Users\....\AppData\Local\Temp\tmpokjxtzo7.ttf"
 
 the temp solution is (tested on python 3.11 windows 11 xhtml2pdf==0.2.8 )
 file:
